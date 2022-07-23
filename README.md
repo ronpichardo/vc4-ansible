@@ -63,6 +63,13 @@ vault_ansible_user: ""
 vault_ansible_pass: ""
 ```
 
+Download the vc4 package, unzip it and place the following files inside of the `roles/virtualcontrol/files` directory
+
+- crestron.repo
+- crestron1.repo
+- requirement.txt
+- virtualcontrol.rpm file (current version: virtualcontrol-4.0000.00007-01.noarch.rpm )
+
 _Running the playbook_
 
 ```shell
