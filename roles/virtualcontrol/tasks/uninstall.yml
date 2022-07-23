@@ -1,0 +1,12 @@
+---
+- name: "{{ vc4_name }} - Uninstall virtualcontrol"
+  expect:
+    command: rpm -e virtualcontrol
+    responses:
+      Select one option from below: 2
+      Username: "{{ vc4_mariadb_root_user }}"
+      Please provide the password for root: "{{ vc4_mariadb_root_pass }}"
+  register: uninstall_results
+
+- debug:
+    var: uninstall_results

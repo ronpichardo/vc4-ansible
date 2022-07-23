@@ -1,0 +1,6 @@
+vault_rhsm_user: ""
+vault_rhsm_pass: ""
+vault_crestron_user: ""
+vault_crestron_pass: ""
+vault_mariadb_root_user: ""
+vault_mariadb_root_pass: ""
