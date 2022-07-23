@@ -1,0 +1,9 @@
+---
+- name: Install VirtualControl4
+  hosts: all
+  gather_facts: yes
+  become: yes
+  tasks:
+    - name: "Run VirtualControl Role"
+      include_role:
+        name: virtualcontrol
