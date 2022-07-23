@@ -10,9 +10,27 @@ Feel free to fork and contribute
 
 I tried using the Ansible Expect module but the job either hangs, or puts in the incorrect values, if anyone has any experience automating that with ansible, feel free to create a pull-request.
 
-### Pre-Requisites
-
 Current Version: [virtualcontrol-4.0000.00007-1](https://www.crestron.com/Software-Firmware/Firmware/4-Series-Control-Systems/VC-4/4-0000-00007-01)
+
+TODO:
+
+- [] Automate/resolve input automation for the rpm package install
+
+The input values:
+
+"Install Are you migrating VC4 from another build? (Y/N) "
+"Enter virtualcontrol Home Path ( Default /opt/crestron/ ) "
+"Press Enter To Continue With Default Value (6980) "
+"Press Enter To Continue With Default Value (41794) "
+"Press Enter To Continue With Default Value (41796) "
+"Press Enter To Continue With Default Value (49200) "
+"Press Enter To Continue With Default Value (49300) "
+"Please provide new password for the MariaDB Root user "
+"confirm pw "
+"Please provide a name for the database or press enter to accept the default (default is VirtualControl) "
+"Please provide the name for the database's user account (default is virtualcontrol) "
+"Please provide a password for the virtualcontrol user or press enter to accept the default (default is [RANDOM STRING]) "
+"confirm "
 
 Update values in the following file
 
@@ -33,8 +51,9 @@ vault_rhsm_user: ""
 vault_rhsm_pass: ""
 vault_crestron_user: ""
 vault_crestron_pass: ""
-vault_mariadb_root_user: ""
 vault_mariadb_root_pass: ""
+vault_mariadb_name: ""
+vault_mariadb_user: ""
 ```
 
 Contents of the `group_vars/all/vault.yml` these are required, they will be used for user and password of the server
@@ -44,6 +63,8 @@ vault_ansible_user: ""
 vault_ansible_pass: ""
 ```
 
-Running the playbook
+_Running the playbook_
 
+```shell
 ansible-playbook installVC4.yml
+```

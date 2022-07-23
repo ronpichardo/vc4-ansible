@@ -1,0 +1,6 @@
+---
+- include_vars: ../defaults/vault.yml
+
+- name: "{{ vc4_package_name }} - running the {{ vc4_action }} task"
+  include_tasks: "{{ vc4_action }}.yml"
+  when: vc4_action != ""
