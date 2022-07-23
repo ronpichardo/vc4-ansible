@@ -4,7 +4,7 @@
     command: rpm -e virtualcontrol
     responses:
       Select one option from below: 2
-      Username: "{{ vc4_mariadb_root_user }}"
+      Username: root
       Please provide the password for root: "{{ vc4_mariadb_root_pass }}"
   register: uninstall_results
 

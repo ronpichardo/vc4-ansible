@@ -1,0 +1,76 @@
+---
+- name: "{{ vc4_name }} - Create tmp directory"
+  file:
+    path: "{{ vc4_script_path }}"
+    state: directory
+
+- name: "{{ vc4_name }} - Copy files to tmp"
+  copy:
+    src: files/{{ item }}
+    dest: "{{ vc4_script_path }}/{{ item }}"
+  loop: "{{ vc4_files }}"
+
+- name: "{{ vc4_name }} - OS Type Redhat, Register with RHSM"
+  redhat_subscription:
+    username: "{{ vc4_rhsm_user }}"
+    password: "{{ vc4_rhsm_pass }}"
+    auto_attach: true
+    state: present
+  when: ansible_distribution == 'RedHat'
+
+- name: "{{ vc4_name }} - OS Type {{ ansible_distribution }}, installing repo files"
+  command: |
+    dnf config-manager --add-repo {{ vc4_script_path }}/crestron.repo
+    dnf config-manager --add-repo {{ vc4_script_path }}/crestron1.repo
+  when: ansible_distribution != 'RedHat'
+
+- name: "{{ vc4_name }} - Install dnf packages"
+  dnf:
+    name: "{{ vc4_dnf_packages }}"
+    state: present
+
+- name: "{{ vc4_name }} - Start httpd service"
+  service:
+    name: httpd
+    enabled: yes
+    state: started
+
+- name: "{{ vc4_name }} - Install pip requirements"
+  pip:
+    requirements: "{{ vc4_script_path }}/requirement.txt"
+    virtualenv: /opt/venv/virtualcontrol/virtualcontrolenv
+    virtualenv_python: python3
+    state: latest
+# - name: "{{ vc4_name }} - install {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm"
+#   expect:
+#     chdir: "{{ vc4_script_path }}"
+#     command: sudo rpm -Uvh --oldpackage --replacepkgs {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm
+#     timeout: 5000
+#     responses:
+#       password for {{ ansible_user }}: "{{ ansible_password }}"
+#       (Y/N): "Y"
+#       virtualcontrol Home Path: "{{ vc4_install_path }}"
+#       (.*)(6980): "{{ vc4_rpm_install.redis_port }}"
+#       (.*)(41794): "{{ vc4_rpm_install.cip_port }}"
+#       (.*)(41796): "{{ vc4_rpm_install.scip_port }}"
+#       (.*)(49200): "{{ vc4_rpm_install.websocket_port }}"
+#       (.*)(49300): "{{ vc4_rpm_install.simpl_debugger_port }}"
+#       Please provide new password for the MariaDB Root user: "{{ vc4_mariadb_root_pass }}"
+#       confirm pw: "{{ vc4_mariadb_root_pass }}"
+#       VirtualControl: "{{ vc4_rpm_install.mariadb_name }}"
+#       virtualcontrol: "{{ vc4_rpm_install.mariadb_user }}"
+#       provide a password for the virtualcontrol: "{{ vc4_mariadb_root_pass }}"
+#       confirm: "{{ vc4_mariadb_root_pass }}"
+#   register: install_rpm_results
+#   environment:
+#     PYTHONPATH: /usr/bin/python3.6
+
+# - name: "{{ vc4_name }} - RPM install results"
+#   debug:
+#     var: install_rpm_results
+
+# - name: "{{ vc4_name }} - Start virtualcontrol service"
+#   service:
+#     name: virtualcontrol
+#     state: started
+#     enable: yes
