@@ -16,7 +16,7 @@ Current Version: [virtualcontrol-4.0000.00007-1](https://www.crestron.com/Softwa
 
 Update values in the following file
 
-- `host` - change `ansible_user` and `ansible_password` to match user/pass combo for your server
+- `host` - change ip address to your servers ip address
 - `.vault.txt` - create a .vault.txt file and save it in the root of this directory with a single line password
 - `vault.yml` - update the 2 vault files in the following location `group_vars/all/vault.yml.example`,`roles/virtualcontrol/defaults/vault.yml.example` and remove the `.example` or make a copy of the file without the `.example` extension
 
@@ -37,7 +37,7 @@ vault_mariadb_root_user: ""
 vault_mariadb_root_pass: ""
 ```
 
-Contents of the `group_vars/all/vault.yml`
+Contents of the `group_vars/all/vault.yml` these are required, they will be used for user and password of the server
 
 ```yaml
 vault_ansible_user: ""
