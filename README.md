@@ -40,9 +40,15 @@ Update values in the following file
 
 ## Usage
 
+- Create a `.ansible_vault_pass.txt` file in the root of this repo with a password
 - add credentials in the `vault.yml` file located in the path `roles/virtualcontrol/defaults/vault.yml`
-
 - If you are using a RedHat system, place credentials in the vault file
+
+Content of .ansible_vault_pass.txt
+
+```text
+my_password_to_use
+```
 
 Contents of the `roles/virtualcontrol/defaults/vault.yml` file
 

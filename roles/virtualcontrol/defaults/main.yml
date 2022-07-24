@@ -1,0 +1,84 @@
+vc4_name: VirtualControl
+vc4_version: 4.0000.00007-1
+vc4_zip_url: https://www.crestron.com/firmware_files/vc-4/vc-4_4.0000.00007.01.zip
+vc4_script_path: /tmp/vc4
+vc4_virtualenv_path: /opt/venv/virtualcontrol/virtualcontrolenv
+vc4_install_path: /opt/crestron
+
+vc4_files:
+  - crestron.repo
+  - crestron1.repo
+  - requirement.txt
+  - "{{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm"
+
+vc4_rpm_install:
+  redis_port: "6980"
+  cip_port: "41794"
+  scip_port: "41796"
+  websocket_port: "49200"
+  simpl_debugger_port: "49300"
+  mariadb_name: "{{ vault_mariadb_name | default('VirtualControl') }}"
+  mariadb_user: "{{ vault_mariadb_user | default('virtualcontrol') }}"
+
+vc4_rhsm_user: "{{ vault_rhsm_user }}"
+vc4_rhsm_pass: "{{ vault_rhsm_pass }}"
+vc4_crestron_user: "{{ vault_crestron_user }}"
+vc4_crestron_pass: "{{ vault_crestron_pass }}"
+vc4_mariadb_root_pass: "{{ vault_mariadb_root_pass }}"
+
+vc4_os_map:
+  RedHat:
+    OpenSsl: "openssl-devel-1:1.1.1c-2.el8.i686"
+    LibAtomic: "libatomic-8.3.*.i686"
+    LibCurl: "libcurl-7.61.1-8.el8.i686"
+    NetSnmp: "net-snmp-agent-libs-1:5.8-7.el8_0.2.i686"
+    RedisCLI: "redis-5.0.3-1.module+el8+2566+19ca22c8.x86_64"
+    NetSnmplib: "net-snmp-libs-1:5.8-7.el8.i686"
+  Default:
+    OpenSsl: "openssl-devel-1.1.1c-15.el8.i686"
+    LibAtomic: "libatomic-8.3.*.i686"
+    LibCurl: "libcurl-7.61.1-12.el8.i686"
+    NetSnmp: "net-snmp-agent-libs-1:5.8-14.el8_2.1.i686"
+    RedisCLI: "redis-5.0.3-2.module_el8.2.0+318+3d7e67ea.x86_64"
+    NetSnmplib: "net-snmp-libs-1:5.8-14.el8_2.1.i686"
+
+vc4_os_packages: "{{ vc4_os_map[ansible_distribution] if ansible_distribution == 'RedHat' else vc4_os_map['Default'] }}"
+
+vc4_dnf_packages:
+  - libstdc++
+  - make
+  - gcc
+  - yum
+  - zip
+  - unzip
+  - tar
+  - telnet
+  - glibc-devel.i686
+  - rsync
+  - policycoreutils-python-utils
+  - glibc-devel
+  - libstdc++.i686
+  - "{{ vc4_os_packages.OpenSsl }}"
+  - yajl-2.1.0-10.el8.i686
+  - "{{ vc4_os_packages.LibCurl }}"
+  - libuuid.i686
+  - "{{ vc4_os_packages.LibAtomic }}"
+  - libevent-devel-2.1.8-5.el8.i686
+  - "{{ vc4_os_packages.NetSnmp }}"
+  - "{{ vc4_os_packages.NetSnmplib }}"
+  - mariadb-server
+  - httpd
+  - mod_security
+  - net-tools
+  - net-snmp
+  - net-snmp-utils
+  - krb5-workstation
+  - krb5-libs
+  - openldap-clients-2.4.46-11.el8_1.x86_64
+  - "{{ vc4_os_packages.RedisCLI }}"
+  - python3-virtualenv
+  - libcgroup-tools
+  - libxml2.i686
+  - python38
+
+vc4_action: install
