@@ -78,6 +78,37 @@ Download the vc4 package, unzip it and place the following files inside of the `
 - requirement.txt
 - virtualcontrol.rpm file (current version: virtualcontrol-4.0000.00007-01.noarch.rpm )
 
+Directory structure should look something like this before running the playbook
+
+```shell
+├── ansible.cfg
+├── .ansible_vault_pass.txt
+├── .gitignore
+├── group_vars
+│   └── all
+│       ├── vars.yml
+│       ├── vault.yml
+│       └── vault.yml.example
+├── hosts
+├── installVC4.yml
+├── README.md
+└── roles
+    └── virtualcontrol
+        ├── defaults
+        │   ├── main.yml
+        │   ├── vault.yml
+        │   └── vault.yml.example
+        ├── files
+        │   ├── crestron.repo
+        │   ├── crestron1.repo
+        │   ├── virtualcontrol-4.0000.00007-01.noarch.rpm
+        │   └── requirement.txt
+        └── tasks
+            ├── install.yml
+            ├── main.yml
+            └── uninstall.yml
+```
+
 _Running the playbook_
 
 ```shell
