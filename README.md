@@ -18,6 +18,7 @@ TODO:
 
 The input values:
 
+```text
 "Install Are you migrating VC4 from another build? (Y/N) "
 "Enter virtualcontrol Home Path ( Default /opt/crestron/ ) "
 "Press Enter To Continue With Default Value (6980) "
@@ -31,6 +32,7 @@ The input values:
 "Please provide the name for the database's user account (default is virtualcontrol) "
 "Please provide a password for the virtualcontrol user or press enter to accept the default (default is [RANDOM STRING]) "
 "confirm "
+```
 
 Update values in the following file
 
