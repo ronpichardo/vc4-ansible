@@ -1,2 +1,5 @@
 .ansible_vault_pass.txt
 vault.yml
+crestron*.repo
+requirements.txt
+virtualcontrol*.rpm
