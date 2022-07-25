@@ -41,36 +41,37 @@
     virtualenv: /opt/venv/virtualcontrol/virtualcontrolenv
     virtualenv_python: python3
     state: latest
-# - name: "{{ vc4_name }} - install {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm"
-#   expect:
-#     chdir: "{{ vc4_script_path }}"
-#     command: sudo rpm -Uvh --oldpackage --replacepkgs {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm
-#     timeout: 5000
-#     responses:
-#       password for {{ ansible_user }}: "{{ ansible_password }}"
-#       (Y/N): "Y"
-#       virtualcontrol Home Path: "{{ vc4_install_path }}"
-#       (.*)(6980): "{{ vc4_rpm_install.redis_port }}"
-#       (.*)(41794): "{{ vc4_rpm_install.cip_port }}"
-#       (.*)(41796): "{{ vc4_rpm_install.scip_port }}"
-#       (.*)(49200): "{{ vc4_rpm_install.websocket_port }}"
-#       (.*)(49300): "{{ vc4_rpm_install.simpl_debugger_port }}"
-#       Please provide new password for the MariaDB Root user: "{{ vc4_mariadb_root_pass }}"
-#       confirm pw: "{{ vc4_mariadb_root_pass }}"
-#       VirtualControl: "{{ vc4_rpm_install.mariadb_name }}"
-#       virtualcontrol: "{{ vc4_rpm_install.mariadb_user }}"
-#       provide a password for the virtualcontrol: "{{ vc4_mariadb_root_pass }}"
-#       confirm: "{{ vc4_mariadb_root_pass }}"
-#   register: install_rpm_results
-#   environment:
-#     PYTHONPATH: /usr/bin/python3.6
 
-# - name: "{{ vc4_name }} - RPM install results"
-#   debug:
-#     var: install_rpm_results
+- name: "{{ vc4_name }} - install {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm"
+  expect:
+    chdir: "{{ vc4_script_path }}"
+    command: rpm -Uvh --oldpackage --replacepkgs {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm
+    timeout: 15
+    responses:
+      # password for {{ ansible_user }}: "{{ ansible_password }}"
+      "(Y/N)": "N"
+      Press Enter To Continue With Default Value: "{{ vc4_install_path }}"
+      "6980": "{{ vc4_rpm_install.redis_port | int }}"
+      "41794": "{{ vc4_rpm_install.cip_port | int }}"
+      "41796": "{{ vc4_rpm_install.scip_port | int }}"
+      "49200": "{{ vc4_rpm_install.websocket_port | int }}"
+      "49300": "{{ vc4_rpm_install.simpl_debugger_port | int }}"
+      Please provide new password for the MariaDB Root user: "{{ vc4_mariadb_root_pass }}"
+      Please confirm the password for root: "{{ vc4_mariadb_root_pass }}"
+      VirtualControl: "{{ vc4_rpm_install.mariadb_name }}"
+      virtualcontrol: "{{ vc4_rpm_install.mariadb_user }}"
+      provide a password for the virtualcontrol: "{{ vc4_mariadb_root_pass }}"
+      confirm: "{{ vc4_mariadb_root_pass }}"
+  register: install_rpm_results
+  environment:
+    PYTHONPATH: /usr/bin/python3.6
 
-# - name: "{{ vc4_name }} - Start virtualcontrol service"
-#   service:
-#     name: virtualcontrol
-#     state: started
-#     enable: yes
+- name: "{{ vc4_name }} - RPM install results"
+  debug:
+    var: install_rpm_results.stdout_lines
+
+- name: "{{ vc4_name }} - Start virtualcontrol service"
+  service:
+    name: virtualcontrol
+    state: started
+    enable: yes

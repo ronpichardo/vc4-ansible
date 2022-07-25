@@ -12,13 +12,13 @@ vc4_files:
   - "{{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm"
 
 vc4_rpm_install:
-  redis_port: "6980"
-  cip_port: "41794"
-  scip_port: "41796"
-  websocket_port: "49200"
-  simpl_debugger_port: "49300"
-  mariadb_name: "{{ vault_mariadb_name | default('VirtualControl') }}"
-  mariadb_user: "{{ vault_mariadb_user | default('virtualcontrol') }}"
+  redis_port: 6980
+  cip_port: 41794
+  scip_port: 41796
+  websocket_port: 49200
+  simpl_debugger_port: 49300
+  mariadb_name: "{{ vault_mariadb_name if vault_mariadb_name != '' else 'VirtualControl' }}"
+  mariadb_user: "{{ vault_mariadb_user if vault_mariadb_user != '' else 'virtualcontrol' }}"
 
 vc4_rhsm_user: "{{ vault_rhsm_user }}"
 vc4_rhsm_pass: "{{ vault_rhsm_pass }}"
