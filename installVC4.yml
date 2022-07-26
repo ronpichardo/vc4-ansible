@@ -4,6 +4,18 @@
   gather_facts: yes
   become: yes
   tasks:
+    - name: "Setup passwordless sudo"
+      lineinfile:
+        path: /etc/sudoers
+        regexp: "^%wheel *"
+        line: "%wheel ALL=(ALL) NOPASSWD:ALL"
+        state: present
+        mode: 0440
+        owner: root
+        group: root
+        create: yes
+        validate: "/usr/sbin/visudo -cf %s"
+
     - name: "Run VirtualControl Role"
       include_role:
         name: virtualcontrol

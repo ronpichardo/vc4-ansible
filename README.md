@@ -14,24 +14,25 @@ Current Version: [virtualcontrol-4.0000.00007-1](https://www.crestron.com/Softwa
 
 TODO:
 
-- [] Automate/resolve input automation for the rpm package install
+- [x] Automate/resolve input automation for the rpm package install
+- [] Try and update the expect task, sometimes if fails even though the install was successful
 
 The input values:
 
 ```text
-"Install Are you migrating VC4 from another build? (Y/N) "
-"Enter virtualcontrol Home Path ( Default /opt/crestron/ ) "
-"Press Enter To Continue With Default Value (6980) "
-"Press Enter To Continue With Default Value (41794) "
-"Press Enter To Continue With Default Value (41796) "
-"Press Enter To Continue With Default Value (49200) "
-"Press Enter To Continue With Default Value (49300) "
-"Please provide new password for the MariaDB Root user "
-"confirm pw "
-"Please provide a name for the database or press enter to accept the default (default is VirtualControl) "
-"Please provide the name for the database's user account (default is virtualcontrol) "
-"Please provide a password for the virtualcontrol user or press enter to accept the default (default is [RANDOM STRING]) "
-"confirm "
+"Are you migrating VC4 from another build? (Y/N) :"
+"Press Enter To Continue With Default Value:"
+"Press Enter To Continue With Default Value (6980):"
+"Press Enter To Continue With Default Value (41794):"
+"Press Enter To Continue With Default Value (41796):"
+"Press Enter To Continue With Default Value (49200):"
+"Press Enter To Continue With Default Value (49300):"
+"Please provide new password for the MariaDB Root user:"
+"Please confirm the password for root:"
+"Please provide a name for the database or press enter to accept the default (default is VirtualControl):"
+"Please provide the name for the database's user account (default is virtualcontrol):"
+"Please provide a password for the virtualcontrol user or press enter to accept the default (default is [RANDOM STRING]):"
+"Please confirm password:"
 ```
 
 Update values in the following file
@@ -113,4 +114,62 @@ _Running the playbook_
 
 ```shell
 ansible-playbook installVC4.yml
+```
+
+Current output when successful.
+
+```shell
+(ansible) ➜  vc4-ansible git:(main) ansible-playbook installVC4.yml
+
+PLAY [Install VirtualControl4] ********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ****************************************************************************************************************************************************************************************
+ok: [vc02]
+
+TASK [Setup sudoers file] *************************************************************************************************************************************************************************************
+changed: [vc02]
+
+TASK [Run VirtualControl Role] ********************************************************************************************************************************************************************************
+
+TASK [virtualcontrol : include_vars] **************************************************************************************************************************************************************************
+ok: [vc02]
+
+TASK [virtualcontrol : VirtualControl - running the install task] *********************************************************************************************************************************************
+included: /home/rage/Scripts/ansible/vc4-ansible/roles/virtualcontrol/tasks/install.yml for vc02
+
+TASK [virtualcontrol : VirtualControl - Create tmp directory] *************************************************************************************************************************************************
+ok: [vc02]
+
+TASK [virtualcontrol : VirtualControl - Copy files to tmp] ****************************************************************************************************************************************************
+changed: [vc02] => (item=crestron.repo)
+changed: [vc02] => (item=crestron1.repo)
+changed: [vc02] => (item=requirement.txt)
+changed: [vc02] => (item=virtualcontrol-4.0000.00007-1.noarch.rpm)
+
+TASK [virtualcontrol : VirtualControl - OS Type Redhat, Register with RHSM] ***********************************************************************************************************************************
+skipping: [vc02]
+
+TASK [virtualcontrol : VirtualControl - OS Type AlmaLinux, installing repo files] *****************************************************************************************************************************
+changed: [vc02]
+
+TASK [virtualcontrol : VirtualControl - Install dnf packages] *************************************************************************************************************************************************
+changed: [vc02]
+
+TASK [virtualcontrol : VirtualControl - Start httpd service] **************************************************************************************************************************************************
+changed: [vc02]
+
+TASK [virtualcontrol : VirtualControl - Install pip requirements] *********************************************************************************************************************************************
+changed: [vc02]
+
+TASK [virtualcontrol : VirtualControl - Install pexpect] ******************************************************************************************************************************************************
+changed: [vc02]
+
+TASK [virtualcontrol : VirtualControl - install virtualcontrol-4.0000.00007-1.noarch.rpm] ******************************************************************************************************
+changed: [vc02]
+
+TASK [virtualcontrol : VirtualControl - Start virtualcontrol service] *****************************************************************************************************************************************
+changed: [vc02]
+
+PLAY RECAP ****************************************************************************************************************************************************************************************************
+vc02                       : ok=13   changed=9    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 ```
