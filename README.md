@@ -123,55 +123,55 @@ Current output when successful.
 ```shell
 (ansible) ➜  vc4-ansible git:(main) ansible-playbook installVC4.yml
 
-PLAY [Install VirtualControl4] ********************************************************************************************************************************************************************************
+PLAY [Install VirtualControl4] ***********************************************************************************************
 
-TASK [Gathering Facts] ****************************************************************************************************************************************************************************************
+TASK [Gathering Facts] *******************************************************************************************************
 ok: [vc02]
 
-TASK [Setup sudoers file] *************************************************************************************************************************************************************************************
+TASK [Setup sudoers file] ****************************************************************************************************
 changed: [vc02]
 
-TASK [Run VirtualControl Role] ********************************************************************************************************************************************************************************
+TASK [Run VirtualControl Role] ***********************************************************************************************
 
-TASK [virtualcontrol : include_vars] **************************************************************************************************************************************************************************
+TASK [virtualcontrol : include_vars] *****************************************************************************************
 ok: [vc02]
 
-TASK [virtualcontrol : VirtualControl - running the install task] *********************************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - running the install task] ************************************************************
 included: /home/rage/Scripts/ansible/vc4-ansible/roles/virtualcontrol/tasks/install.yml for vc02
 
-TASK [virtualcontrol : VirtualControl - Create tmp directory] *************************************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - Create tmp directory] ****************************************************************
 ok: [vc02]
 
-TASK [virtualcontrol : VirtualControl - Copy files to tmp] ****************************************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - Copy files to tmp] *******************************************************************
 changed: [vc02] => (item=crestron.repo)
 changed: [vc02] => (item=crestron1.repo)
 changed: [vc02] => (item=requirement.txt)
 changed: [vc02] => (item=virtualcontrol-4.0000.00007-1.noarch.rpm)
 
-TASK [virtualcontrol : VirtualControl - OS Type Redhat, Register with RHSM] ***********************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - OS Type Redhat, Register with RHSM] **************************************************
 skipping: [vc02]
 
-TASK [virtualcontrol : VirtualControl - OS Type AlmaLinux, installing repo files] *****************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - OS Type AlmaLinux, installing repo files] ********************************************
 changed: [vc02]
 
-TASK [virtualcontrol : VirtualControl - Install dnf packages] *************************************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - Install dnf packages] ****************************************************************
 changed: [vc02]
 
-TASK [virtualcontrol : VirtualControl - Start httpd service] **************************************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - Start httpd service] *****************************************************************
 changed: [vc02]
 
-TASK [virtualcontrol : VirtualControl - Install pip requirements] *********************************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - Install pip requirements] ************************************************************
 changed: [vc02]
 
-TASK [virtualcontrol : VirtualControl - Install pexpect] ******************************************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - Install pexpect] *********************************************************************
 changed: [vc02]
 
-TASK [virtualcontrol : VirtualControl - install virtualcontrol-4.0000.00007-1.noarch.rpm] ******************************************************************************************************
+TASK [virtualcontrol : VirtualControl - install virtualcontrol-4.0000.00007-1.noarch.rpm] ************************************
 changed: [vc02]
 
-TASK [virtualcontrol : VirtualControl - Start virtualcontrol service] *****************************************************************************************************************************************
+TASK [virtualcontrol : VirtualControl - Start virtualcontrol service] ********************************************************
 changed: [vc02]
 
-PLAY RECAP ****************************************************************************************************************************************************************************************************
+PLAY RECAP *******************************************************************************************************************
 vc02                       : ok=13   changed=9    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 ```
