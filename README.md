@@ -6,7 +6,9 @@ Ansible role for automating the installation of Crestrons Virtual Control 4 Serv
 
 Feel free to fork and contribute
 
-**The only part of the task I am unable to complete is the rpm install, it requires user input**
+**Was able to get the rpm install to work with expect, but sometimes the task fails although the install was successful**
+
+Tested with AlmaLinux 8.6
 
 I tried using the Ansible Expect module but the job either hangs, or puts in the incorrect values, if anyone has any experience automating that with ansible, feel free to create a pull-request.
 
