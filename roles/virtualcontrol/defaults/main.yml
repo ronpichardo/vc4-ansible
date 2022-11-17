@@ -1,5 +1,5 @@
 vc4_name: VirtualControl
-vc4_version: 4.0000.00007-1
+vc4_version: 4.0000.00012-1
 vc4_zip_url: https://www.crestron.com/firmware_files/vc-4/vc-4_4.0000.00007.01.zip
 vc4_script_path: /tmp/vc4
 vc4_virtualenv_path: /opt/venv/virtualcontrol/virtualcontrolenv
