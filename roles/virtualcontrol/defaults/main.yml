@@ -1,6 +1,5 @@
 vc4_name: VirtualControl
-vc4_version: 4.0000.00012-1
-vc4_zip_url: https://www.crestron.com/firmware_files/vc-4/vc-4_4.0000.00007.01.zip
+vc4_version: 4.0000.00057-1
 vc4_script_path: /tmp/vc4
 vc4_virtualenv_path: /opt/venv/virtualcontrol/virtualcontrolenv
 vc4_install_path: /opt/crestron
@@ -30,14 +29,12 @@ vc4_os_map:
   RedHat:
     OpenSsl: "openssl-devel-1:1.1.1c-2.el8.i686"
     LibAtomic: "libatomic-8.3.*.i686"
-    LibCurl: "libcurl-7.61.1-8.el8.i686"
     NetSnmp: "net-snmp-agent-libs-1:5.8-7.el8_0.2.i686"
     RedisCLI: "redis-5.0.3-1.module+el8+2566+19ca22c8.x86_64"
     NetSnmplib: "net-snmp-libs-1:5.8-7.el8.i686"
   Default:
     OpenSsl: "openssl-devel-1.1.1c-15.el8.i686"
     LibAtomic: "libatomic-8.3.*.i686"
-    LibCurl: "libcurl-7.61.1-12.el8.i686"
     NetSnmp: "net-snmp-agent-libs-1:5.8-14.el8_2.1.i686"
     RedisCLI: "redis-5.0.3-2.module_el8.2.0+318+3d7e67ea.x86_64"
     NetSnmplib: "net-snmp-libs-1:5.8-14.el8_2.1.i686"
@@ -59,8 +56,8 @@ vc4_dnf_packages:
   - glibc-devel
   - libstdc++.i686
   - "{{ vc4_os_packages.OpenSsl }}"
-  - yajl-2.1.0-10.el8.i686
-  - "{{ vc4_os_packages.LibCurl }}"
+  - yajl.i686
+  - libcurl.i686
   - libuuid.i686
   - "{{ vc4_os_packages.LibAtomic }}"
   - libevent-devel-2.1.8-5.el8.i686
