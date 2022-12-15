@@ -16,9 +16,15 @@
         create: yes
         validate: "/usr/sbin/visudo -cf %s"
 
+<<<<<<< HEAD
 #    - name: "Run VirtualControl Role"
 #      include_role:
 #        name: virtualcontrol
+=======
+    - name: "Run VirtualControl Role"
+      include_role:
+        name: virtualcontrol
+>>>>>>> 0d26a31ac798557a027ac7b97eb3ee8d9ce7bc34
 
     - name: "Install mod_ssl for VC-4 Hardening"
       ansible.builtin.dnf:
