@@ -19,3 +19,75 @@
     - name: "Run VirtualControl Role"
       include_role:
         name: virtualcontrol
+
+    - name: "Install mod_ssl for VC-4 Hardening"
+      ansible.builtin.dnf:
+        name: mod_ssl
+        state: latest
+
+    - name: "Add VC-4 firewalld rules for port 443"
+      ansible.posix.firewalld:
+        service: https
+        permanent: yes
+        state: enabled
+        immediate: yes
+
+    - name: "Install mod_authnz_pam for VC-4 Hardening"
+      ansible.builtin.dnf:
+        name: mod_authnz_pam
+        state: latest
+
+    - name: "Setup mod_authnz_pam for VC-4 Hardening"
+      shell: sed -i 's/#/ /g' /etc/httpd/conf.modules.d/55-authnz_pam.conf
+
+    - name: "Copy pam auth config for VC-4 Hardening"
+      copy:
+        src: files/httpd-auth
+        dest: "/etc/pam.d/httpd-auth"
+
+    - name: "Setup permissions for Shadow VC-4 Hardening"
+      ansible.builtin.file:
+        path: /etc/shadow
+        group: apache
+        mode: '440'
+
+    - name: "Configure Se Linux for httpd_md VC-4 Hardening"
+      ansible.posix.seboolean:
+        name: httpd_mod_auth_pam
+        state: yes
+        persistent: yes
+
+    - name: "Copy pam auth config for VC-4 Hardening"
+      copy:
+        src: files/crestron.conf
+        dest: "/etc/httpd/conf.modules.d/crestron.conf"
+
+    - name: "Restart HTTPD for VC-4 Hardening"
+      ansible.builtin.systemd:
+        state: restarted
+        daemon_reload: yes
+        name: httpd
+
+    - name: "Upgrade all packages"
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+        update_cache: yes
+
+    - name: "Install Cockpit"
+      ansible.builtin.dnf:
+        name: cockpit
+        state: latest
+
+    - name: "Start and Enable Cockpit to run on Boot"
+      ansible.builtin.systemd:
+        state: started
+        daemon_reload: yes
+        name: cockpit.socket
+        enabled: yes
+
+    - name: "Install Cockpit Navigator"
+      ansible.builtin.dnf:
+        name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator-0.5.10-1.el8.noarch.rpm
+        state: latest
+        disable_gpg_check: yes

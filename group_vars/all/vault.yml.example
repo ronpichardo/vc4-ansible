@@ -1,2 +1,2 @@
-vault_ansible_user: vcuser
-vault_ansible_pass: vcusr
+vault_ansible_user: ""
+vault_ansible_pass: ""

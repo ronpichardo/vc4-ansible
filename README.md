@@ -2,7 +2,7 @@
 
 ## Description
 
-Ansible role for automating the installation of Crestrons Virtual Control 4 Server based ControlSystem.
+Ansible role for automating the installation of Crestrons Virtual Control 4 Server based ControlSystem.  This automation will install VC4, harden the system, and install Cockpit
 
 Feel free to fork and contribute
 
@@ -12,7 +12,7 @@ Tested with AlmaLinux 8.6
 
 I tried using the Ansible Expect module but the job either hangs, or puts in the incorrect values, if anyone has any experience automating that with ansible, feel free to create a pull-request.
 
-Current Version: [virtualcontrol-4.0000.00007-1](https://www.crestron.com/Software-Firmware/Firmware/4-Series-Control-Systems/VC-4/4-0000-00007-01)
+Current Version: [virtualcontrol-4.0000.00057-1]https://www.crestron.com/Software-Firmware/Firmware/4-Series-Control-Systems/VC-4/4-0000-00057)
 
 TODO:
 
@@ -79,7 +79,7 @@ Download the vc4 package, unzip it and place the following files inside of the `
 - crestron.repo
 - crestron1.repo
 - requirement.txt
-- virtualcontrol.rpm file (current version: virtualcontrol-4.0000.00007-01.noarch.rpm )
+- virtualcontrol.rpm file (current version: virtualcontrol-4.0000.00057-1.noarch.rpm )
 
 Directory structure should look something like this before running the playbook
 
@@ -123,55 +123,92 @@ Current output when successful.
 ```shell
 (ansible) ➜  vc4-ansible git:(main) ansible-playbook installVC4.yml
 
-PLAY [Install VirtualControl4] ***********************************************************************************************
+PLAY [Install VirtualControl4] *************************************************************************************************************************************************************
+TASK [Gathering Facts] *********************************************************************************************************************************************************************
+ok: [192.168.1.2]
 
-TASK [Gathering Facts] *******************************************************************************************************
-ok: [vc02]
+TASK [Setup passwordless sudo] *************************************************************************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [Setup sudoers file] ****************************************************************************************************
-changed: [vc02]
+TASK [Run VirtualControl Role] *************************************************************************************************************************************************************
+TASK [virtualcontrol : include_vars] *******************************************************************************************************************************************************
+ok: [192.168.1.2]
 
-TASK [Run VirtualControl Role] ***********************************************************************************************
+TASK [virtualcontrol : VirtualControl - running the install task] **************************************************************************************************************************
+included: /home/gschellhas/vc4-ansible/roles/virtualcontrol/tasks/install.yml for 192.168.1.2
 
-TASK [virtualcontrol : include_vars] *****************************************************************************************
-ok: [vc02]
+TASK [virtualcontrol : VirtualControl - Create tmp directory] ******************************************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - running the install task] ************************************************************
-included: /home/rage/Scripts/ansible/vc4-ansible/roles/virtualcontrol/tasks/install.yml for vc02
+TASK [virtualcontrol : VirtualControl - Copy files to tmp] *********************************************************************************************************************************
+changed: [192.168.1.2] => (item=crestron.repo)
+changed: [192.168.1.2] => (item=crestron1.repo)
+changed: [192.168.1.2] => (item=requirement.txt)
+changed: [192.168.1.2] => (item=virtualcontrol-4.0000.00057-1.noarch.rpm)
 
-TASK [virtualcontrol : VirtualControl - Create tmp directory] ****************************************************************
-ok: [vc02]
+TASK [virtualcontrol : VirtualControl - OS Type Redhat, Register with RHSM] ****************************************************************************************************************
+skipping: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - Copy files to tmp] *******************************************************************
-changed: [vc02] => (item=crestron.repo)
-changed: [vc02] => (item=crestron1.repo)
-changed: [vc02] => (item=requirement.txt)
-changed: [vc02] => (item=virtualcontrol-4.0000.00007-1.noarch.rpm)
+TASK [virtualcontrol : VirtualControl - OS Type AlmaLinux, installing repo files] **********************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - OS Type Redhat, Register with RHSM] **************************************************
-skipping: [vc02]
+TASK [virtualcontrol : VirtualControl - Install dnf packages] ******************************************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - OS Type AlmaLinux, installing repo files] ********************************************
-changed: [vc02]
+TASK [virtualcontrol : VirtualControl - Start httpd service] *******************************************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - Install dnf packages] ****************************************************************
-changed: [vc02]
+TASK [virtualcontrol : VirtualControl - Install pip requirements] **************************************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - Start httpd service] *****************************************************************
-changed: [vc02]
+TASK [virtualcontrol : VirtualControl - Install pexpect] ***********************************************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - Install pip requirements] ************************************************************
-changed: [vc02]
+TASK [virtualcontrol : VirtualControl - install virtualcontrol-4.0000.00057-1.noarch.rpm] **************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - Install pexpect] *********************************************************************
-changed: [vc02]
+TASK [virtualcontrol : VirtualControl - Start virtualcontrol service] **********************************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - install virtualcontrol-4.0000.00007-1.noarch.rpm] ************************************
-changed: [vc02]
+TASK [Install mod_ssl for VC-4 Hardening] **************************************************************************************************************************************************
+changed: [192.168.1.2]
 
-TASK [virtualcontrol : VirtualControl - Start virtualcontrol service] ********************************************************
-changed: [vc02]
+TASK [Add VC-4 firewalld rules for port 443] ***********************************************************************************************************************************************
+changed: [192.168.1.2]
 
-PLAY RECAP *******************************************************************************************************************
-vc02                       : ok=13   changed=9    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+TASK [Install mod_authnz_pam for VC-4 Hardening] *******************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Setup mod_authnz_pam for VC-4 Hardening] *********************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Copy pam auth config for VC-4 Hardening] *********************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Setup permissions for Shadow VC-4 Hardening] *****************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Configure Se Linux for httpd_md VC-4 Hardening] **************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Copy pam auth config for VC-4 Hardening] *********************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Restart HTTPD for VC-4 Hardening] ****************************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Upgrade all packages] ****************************************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Install Cockpit] *********************************************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Start and Enable Cockpit to run on Boot] *********************************************************************************************************************************************
+changed: [192.168.1.2]
+
+TASK [Install Cockpit Navigator] ***********************************************************************************************************************************************************
+changed: [192.168.1.2]
+
+PLAY RECAP *********************************************************************************************************************************************************************************
+192.168.1.2                : ok=27   changed=23   unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
 ```
