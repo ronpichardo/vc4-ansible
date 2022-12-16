@@ -52,20 +52,25 @@
   expect:
     chdir: "{{ vc4_script_path }}"
     command: rpm -Uvh --oldpackage --replacepkgs {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm
-    timeout: 180
+    timeout: 360
     responses:
       (.*)migrating VC4(.*): "N"
       Press Enter To Continue: ""
       (.*)MariaDB Root user: "{{ vc4_mariadb_root_pass }}"
-      (.*)Please confirm the password for root: "{{ vc4_mariadb_root_pass }}"
+      (.*)Please confirm the password for root(.*): "{{ vc4_mariadb_root_pass }}"
       (.*)VirtualControl(.*): ""
       (.*)user account(.*): ""
       (.*)press enter to accept the default(.*): "{{ vc4_mariadb_root_pass }}"
       (.*)Please confirm password(.*): "{{ vc4_mariadb_root_pass }}"
+      (.*)Select one option from below:(.*): "1"
+      (.*)Username:(.*): "root"
+      (.*)Password:(.*): "{{ vc4_mariadb_root_pass }}"
+      (.*)Please provide the password for root(.*): "{{ vc4_mariadb_root_pass }}"
   register: install_rpm_results
   failed_when: "install_rpm_results.rc != 0 or 'Cleaning temp folders and files' not in install_rpm_results.stdout"
   environment:
     PYTHONPATH: /usr/bin/python3.6
+- debug:  msg="{{ install_rpm_results.rc }}"
 
 - name: "{{ vc4_name }} - Start virtualcontrol service"
   service:

@@ -29,12 +29,14 @@ vc4_os_map:
   RedHat:
     OpenSsl: "openssl-devel-1:1.1.1c-2.el8.i686"
     LibAtomic: "libatomic-8.3.*.i686"
+    LibCurl: "libcurl-7.61.1-22.el8_6.3.i686"
     NetSnmp: "net-snmp-agent-libs-1:5.8-7.el8_0.2.i686"
     RedisCLI: "redis-5.0.3-1.module+el8+2566+19ca22c8.x86_64"
     NetSnmplib: "net-snmp-libs-1:5.8-7.el8.i686"
   Default:
     OpenSsl: "openssl-devel-1.1.1c-15.el8.i686"
     LibAtomic: "libatomic-8.3.*.i686"
+    LibCurl: "libcurl-7.61.1-12.el8.i686"
     NetSnmp: "net-snmp-agent-libs-1:5.8-14.el8_2.1.i686"
     RedisCLI: "redis-5.0.3-2.module_el8.2.0+318+3d7e67ea.x86_64"
     NetSnmplib: "net-snmp-libs-1:5.8-14.el8_2.1.i686"
@@ -57,7 +59,7 @@ vc4_dnf_packages:
   - libstdc++.i686
   - "{{ vc4_os_packages.OpenSsl }}"
   - yajl.i686
-  - libcurl.i686
+  -  "{{ vc4_os_packages.LibCurl }}"
   - libuuid.i686
   - "{{ vc4_os_packages.LibAtomic }}"
   - libevent-devel-2.1.8-5.el8.i686
