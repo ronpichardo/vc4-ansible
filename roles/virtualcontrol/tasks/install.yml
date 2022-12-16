@@ -70,7 +70,6 @@
   failed_when: "install_rpm_results.rc != 0 or 'Cleaning temp folders and files' not in install_rpm_results.stdout"
   environment:
     PYTHONPATH: /usr/bin/python3.6
-- debug:  msg="{{ install_rpm_results.rc }}"
 
 - name: "{{ vc4_name }} - Start virtualcontrol service"
   service:
