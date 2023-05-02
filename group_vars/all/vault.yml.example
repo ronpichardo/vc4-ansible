@@ -1,2 +1,2 @@
-vault_ansible_user: ""
-vault_ansible_pass: ""
+vault_ansible_user: "user"
+vault_ansible_pass: "password"
