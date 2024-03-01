@@ -1,4 +1,18 @@
 ---
+- name: "{{ vc4_name }} - Check if service installed"
+  stat:
+    path: /etc/systemd/system/virtualcontrol.service
+  register: vc4_systemd_file
+
+- name: "{{ vc4_name }} - Stop virtualcontrol service"
+  service:
+    name: "{{ item | lower }}"
+    state: stopped
+  loop:
+    - "{{ vc4_name }}"
+    - "{{ vc4_name }}auth"
+  when: vc4_systemd_file.stat.exists == True
+
 - name: "{{ vc4_name }} - Create tmp directory"
   file:
     path: "{{ vc4_script_path }}"
@@ -6,34 +20,104 @@
 
 - name: "{{ vc4_name }} - Copy files to tmp"
   copy:
-    src: files/{{ item }}
+    src: "{{ item }}"
     dest: "{{ vc4_script_path }}/{{ item }}"
   loop: "{{ vc4_files }}"
 
-- name: "{{ vc4_name }} - OS Type Redhat, Register with RHSM"
-  redhat_subscription:
-    username: "{{ vc4_rhsm_user }}"
-    password: "{{ vc4_rhsm_pass }}"
-    auto_attach: true
-    state: present
-  when: ansible_distribution == 'RedHat'
+- block:
+    - name: "{{ vc4_name }} - OS Type Redhat, Register with RHSM"
+      redhat_subscription:
+        username: "{{ vc4_rhsm_user }}"
+        password: "{{ vc4_rhsm_pass }}"
+        auto_attach: true
+        state: present
 
-- name: "{{ vc4_name }} - OS Type {{ ansible_distribution }}, installing repo files"
-  command: |
-    dnf config-manager --add-repo {{ vc4_script_path }}/crestron.repo
-    dnf config-manager --add-repo {{ vc4_script_path }}/crestron1.repo
-  when: ansible_distribution != 'RedHat'
+    - name: "{{ vc4_name }} - Download EPEL rpm"
+      get_url:
+        url: "{{ vc4_epel_url }}"
+        dest: /tmp/{{ vc4_epel_filename }}
+        mode: 0755
+        validate_certs: no
+
+    - name: "{{ vc4_name }} - Import EPEL GPG key"
+      rpm_key:
+        key: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+        state: present
+      environment: "{{ web_proxy_env if web_proxy != '' else omit }}"
+
+    - name: "{{ vc4_name }} - Install EPEL repo"
+      dnf:
+        name: /tmp/{{ vc4_epel_filename }}
+        state: present
+  when:
+    - ansible_distribution == "RedHat"
+    - ansible_distribution_major_version | int >= 8
+
+- block:
+    - name: "{{ vc4_name }} - Install EPEL packages"
+      dnf:
+        name: epel-release
+        state: present
+
+    - name: "{{ vc4_name }} - OS Type {{ ansible_distribution }}, installing repo files"
+      command: |
+        dnf config-manager --add-repo {{ vc4_script_path }}/crestron.repo
+        dnf config-manager --add-repo {{ vc4_script_path }}/crestron1.repo
+      when: ansible_distribution_major_version | int < 9
+
+    - block:
+        - name: "{{ vc4_name }} - Check for minor version"
+          shell: cat /etc/os-release | grep "AlmaLinux 8.8" | wc -l
+          register: vc4_needs_perllibs
+
+        - name: "{{ vc4_name }} - Install perl-libs"
+          dnf:
+            name: perl-libs
+            state: latest
+          when: vc4_needs_perllibs.stdout | int == 1
+      when: ansible_distribution == "AlmaLinux"
+  when: ansible_distribution != "RedHat"
 
 - name: "{{ vc4_name }} - Install dnf packages"
   dnf:
     name: "{{ vc4_dnf_packages }}"
-    state: present
+    state: latest
 
 - name: "{{ vc4_name }} - Start httpd service"
   service:
     name: httpd
     enabled: yes
     state: started
+
+- name: "{{ vc4_name }} - Install pip packages"
+  pip:
+    name:
+      - pexpect
+      - virtualenv
+    state: latest
+
+- name: "{{ vc4_name }} - install {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm"
+  expect:
+    chdir: "{{ vc4_script_path }}"
+    command: rpm -Uvh --oldpackage --replacepkgs {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm
+    timeout: 360
+    responses:
+      (.*)migrating VC4(.*): "N"
+      Press Enter To Continue: ""
+      (.*)MariaDB Root user: "{{ vc4_mariadb_root_pass }}"
+      (.*)Please confirm the password for root(.*): "{{ vc4_mariadb_root_pass }}"
+      (.*)VirtualControl(.*): ""
+      (.*)user account(.*): ""
+      (.*)press enter to accept the default(.*): "{{ vc4_mariadb_root_pass }}"
+      (.*)Please confirm password(.*): "{{ vc4_mariadb_root_pass }}"
+      (.*)Select one option from below:(.*): "1"
+      (.*)Username:(.*): "{{ vc4_mariadb_root_user }}"
+      (.*)Password:(.*): "{{ vc4_mariadb_root_pass }}"
+      (.*)Please provide the password for root(.*): "{{ vc4_mariadb_root_pass }}"
+  register: install_rpm_results
+  failed_when: "install_rpm_results.rc != 0 or 'Cleaning temp folders and files' not in install_rpm_results.stdout"
+  environment:
+    PYTHONPATH: /usr/bin/python3
 
 - name: "{{ vc4_name }} - Install pip requirements"
   pip:
@@ -42,33 +126,79 @@
     virtualenv_python: python3
     state: latest
 
-- name: "{{ vc4_name }} - Install pexpect"
-  pip:
-    name: pexpect
-    state: latest
-    extra_args: --user
+- block:
+    - name: "{{ vc4_name }} - Start and Enable cgconfig"
+      service:
+        name: cgconfig
+        daemon_reload: yes
+        enabled: yes
+        state: started
 
-- name: "{{ vc4_name }} - install {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm"
-  expect:
-    chdir: "{{ vc4_script_path }}"
-    command: rpm -Uvh --oldpackage --replacepkgs {{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm
-    timeout: 180
-    responses:
-      (.*)migrating VC4(.*): "N"
-      Press Enter To Continue: ""
-      (.*)MariaDB Root user: "{{ vc4_mariadb_root_pass }}"
-      (.*)Please confirm the password for root: "{{ vc4_mariadb_root_pass }}"
-      (.*)VirtualControl(.*): ""
-      (.*)user account(.*): ""
-      (.*)press enter to accept the default(.*): "{{ vc4_mariadb_root_pass }}"
-      (.*)Please confirm password(.*): "{{ vc4_mariadb_root_pass }}"
-  register: install_rpm_results
-  failed_when: "install_rpm_results.rc != 0 or 'Cleaning temp folders and files' not in install_rpm_results.stdout"
-  environment:
-    PYTHONPATH: /usr/bin/python3.6
+    - name: "{{ vc4_name }} - Execute cgconfigparser"
+      shell: cgconfigparser --load=/{{ vc4_install_path }}/virtualcontrol/conf/vc4cgconfig.conf
+
+    - name: "{{ vc4_name }} Restart cgconfig service"
+      service:
+        name: cgconfig
+        state: restarted
+  when: ansible_distribution_major_version | int < 9
 
 - name: "{{ vc4_name }} - Start virtualcontrol service"
   service:
     name: virtualcontrol
     state: started
     enabled: yes
+
+- name: "{{ vc4_name }} - Update snmp config file"
+  lineinfile:
+    path: /etc/snmp/snmpd.conf
+    regexp: "^{{ item }}"
+    line: "{{ item }}"
+    state: present
+  loop:
+    - master agentx
+    - agentXSocket tcp:localhost:705
+
+- name: "{{ vc4_name }} - Restart SNMPD service"
+  service:
+    name: snmpd
+    state: restarted
+    enabled: yes
+
+- block:
+    - name: "{{ vc4_name }} - Install cockpit"
+      dnf:
+        name: cockpit
+        state: latest
+
+    - name: "{{ vc4_name }} - Start and Enable Cockpit to run on Boot"
+      systemd:
+        name: cockpit.socket
+        daemon_reload: yes
+        enabled: yes
+        state: started
+
+    - name: "{{ vc4_name }} - Install Cockpit Navigator"
+      dnf:
+        name: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator-0.5.10-1.el8.noarch.rpm
+        state: latest
+        disable_gpg_check: yes
+  when: vc4_include_cockpit | bool == True
+
+- name: "{{ vc4_name }} - Include hardening tasks"
+  include_tasks: harden.yml
+  when: vc4_include_hardening | bool == True
+
+- name: "{{ vc4_name }} - Template udisk rules"
+  template:
+    src: udisks-crestron.j2
+    dest: /etc/udev/rules.d/80-udisks-crestron.rules
+    owner: virtualcontroluser
+    group: wheel
+    mode: 0644
+
+- name: "{{ vc4_name }} - Reload udev rules"
+  shell: udevadm control --reload-rules
+
+- name: "{{ vc4_name }} - Restart server"
+  reboot:
