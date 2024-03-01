@@ -1,0 +1,2 @@
+SUBSYSTEM=="usbmisc",SUBSYSTEMS=="usb" ATTRS{idVendor}=="0529", ATTRS{idProduct}=="*", MODE="0666"
+SUBSYSTEMS=="usb" ATTRS{idVendor}=="*", ATTRS{idProduct}=="*", MODE="0666", ACTION=="add|unbind", RUN+="{{ vc4_install_path }}/virtualcontrol/CrestronApps/bin/CrestronUSBEventManagerService.sh"
