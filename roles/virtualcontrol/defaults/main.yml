@@ -15,7 +15,7 @@ vc4_cockpit_navigator_pkg: https://github.com/45Drives/cockpit-navigator/release
 vc4_files:
   - crestron.repo
   - crestron1.repo
-  - requirement.txt
+  - requirement-{{ ansible_distribution_major_version }}.txt
   - "{{ vc4_name | lower }}-{{ vc4_version }}.noarch.rpm"
 
 vc4_rpm_install:
