@@ -1,9 +1,16 @@
 vc4_name: VirtualControl
-vc4_version: 4.0000.00007-1
-vc4_zip_url: https://www.crestron.com/firmware_files/vc-4/vc-4_4.0000.00007.01.zip
+vc4_version: 4.0003.00039-1
+vc4_zip_url: https://www.crestron.com/firmware_files/vc-4/vc-4_4.0003.00039.02.zip
 vc4_script_path: /tmp/vc4
 vc4_virtualenv_path: /opt/venv/virtualcontrol/virtualcontrolenv
 vc4_install_path: /opt/crestron
+
+vc4_epel_url: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+vc4_epel_filename: epel-release-latest-{{ ansible_distribution_major_version }}.rpm
+
+vc4_include_cockpit: True
+vc4_include_hardening: True
+vc4_cockpit_navigator_pkg: https://github.com/45Drives/cockpit-navigator/releases/download/v0.5.10/cockpit-navigator-0.5.10-1.el8.noarch.rpm
 
 vc4_files:
   - crestron.repo
@@ -24,31 +31,16 @@ vc4_rhsm_user: "{{ vault_rhsm_user }}"
 vc4_rhsm_pass: "{{ vault_rhsm_pass }}"
 vc4_crestron_user: "{{ vault_crestron_user }}"
 vc4_crestron_pass: "{{ vault_crestron_pass }}"
-vc4_mariadb_root_pass: "{{ vault_mariadb_root_pass }}"
+vc4_mariadb_root_user: "{{ vault_mariadb_root_user | default('root') }}"
+vc4_mariadb_root_pass: "{{ vault_mariadb_root_pass | default('mariadbrootpass') }}"
 
-vc4_os_map:
-  RedHat:
-    OpenSsl: "openssl-devel-1:1.1.1c-2.el8.i686"
-    LibAtomic: "libatomic-8.3.*.i686"
-    LibCurl: "libcurl-7.61.1-8.el8.i686"
-    NetSnmp: "net-snmp-agent-libs-1:5.8-7.el8_0.2.i686"
-    RedisCLI: "redis-5.0.3-1.module+el8+2566+19ca22c8.x86_64"
-    NetSnmplib: "net-snmp-libs-1:5.8-7.el8.i686"
-  Default:
-    OpenSsl: "openssl-devel-1.1.1c-15.el8.i686"
-    LibAtomic: "libatomic-8.3.*.i686"
-    LibCurl: "libcurl-7.61.1-12.el8.i686"
-    NetSnmp: "net-snmp-agent-libs-1:5.8-14.el8_2.1.i686"
-    RedisCLI: "redis-5.0.3-2.module_el8.2.0+318+3d7e67ea.x86_64"
-    NetSnmplib: "net-snmp-libs-1:5.8-14.el8_2.1.i686"
-
-vc4_os_packages: "{{ vc4_os_map[ansible_distribution] if ansible_distribution == 'RedHat' else vc4_os_map['Default'] }}"
-
-vc4_dnf_packages:
-  - libstdc++
+vc4_common_packages:
+  - zlib
   - make
+  - libstdc++
+  - libstdc++.i686
   - gcc
-  - yum
+  - gcc-c++
   - zip
   - unzip
   - tar
@@ -57,15 +49,8 @@ vc4_dnf_packages:
   - rsync
   - policycoreutils-python-utils
   - glibc-devel
-  - libstdc++.i686
-  - "{{ vc4_os_packages.OpenSsl }}"
-  - yajl-2.1.0-10.el8.i686
-  - "{{ vc4_os_packages.LibCurl }}"
-  - libuuid.i686
-  - "{{ vc4_os_packages.LibAtomic }}"
-  - libevent-devel-2.1.8-5.el8.i686
-  - "{{ vc4_os_packages.NetSnmp }}"
-  - "{{ vc4_os_packages.NetSnmplib }}"
+  - yajl{{ '' if ansible_distribution_major_version | int < 9 else '-2*' }}.i686
+  - libevent-devel-2*.i686
   - mariadb-server
   - httpd
   - mod_security
@@ -74,11 +59,45 @@ vc4_dnf_packages:
   - net-snmp-utils
   - krb5-workstation
   - krb5-libs
-  - openldap-clients-2.4.46-11.el8_1.x86_64
-  - "{{ vc4_os_packages.RedisCLI }}"
-  - python3-virtualenv
-  - libcgroup-tools
+  - openldap-clients{{ '-2.4.46-11.el8_1.x86_64' if ansible_distribution_major_version | int < 9 else '' }}
   - libxml2.i686
-  - python38
+  - libxml2
+  - xerces-c.x86_64
+  - python3{{ '8' if ansible_distribution_major_version | int < 9 else '' }}
+  - python3{{ '8' if ansible_distribution_major_version | int < 9 else '' }}-devel
+  - mod_ssl
+  - mod_authnz_pam
+
+vc4_os_map:
+  8:
+    - openssl-devel-1*.i686
+    - libatomic-8*.i686
+    - net-snmp-libs.i686
+    - net-snmp-agent-libs.i686
+    - redis-5*.x86_64
+    - python3-virtualenv
+    - openldap-clients-2.4.46-11.el8_1.x86_64
+    - yajl.i686
+    - libcgroup-tools
+    - libcurl.i686
+    - libuuid.i686
+  9:
+    - openssl-devel
+    - openssl-devel.i686
+    - libatomic-11*.i686
+    - libcurl-7*.i686
+    - net-snmp-libs.i686
+    - net-snmp-agent-libs.i686
+    - redis
+    - python-pip
+    - yajl
+    - openldap-clients
+    - libcurl-devel-7*.i686
+    - libuuid-devel.i686
+    - python-alembic
+    - "@Development tools"
+
+vc4_os_packages: "{{ vc4_os_map[ansible_distribution_major_version | int] }}"
+vc4_dnf_packages: "{{ vc4_common_packages + vc4_os_packages }}"
 
 vc4_action: install
