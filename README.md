@@ -8,34 +8,11 @@ Feel free to fork and contribute
 
 **Was able to get the rpm install to work with expect, but sometimes the task fails although the install was successful**
 
-Tested with AlmaLinux 8.6
+Tested with RockyLinux 9.3
 
 I tried using the Ansible Expect module but the job either hangs, or puts in the incorrect values, if anyone has any experience automating that with ansible, feel free to create a pull-request.
 
-Current Version: [virtualcontrol-4.0000.00007-1](https://www.crestron.com/Software-Firmware/Firmware/4-Series-Control-Systems/VC-4/4-0000-00007-01)
-
-TODO:
-
-- [x] Automate/resolve input automation for the rpm package install
-- [] Try and update the expect task, sometimes if fails even though the install was successful
-
-The input values:
-
-```text
-"Are you migrating VC4 from another build? (Y/N) :"
-"Press Enter To Continue With Default Value:"
-"Press Enter To Continue With Default Value (6980):"
-"Press Enter To Continue With Default Value (41794):"
-"Press Enter To Continue With Default Value (41796):"
-"Press Enter To Continue With Default Value (49200):"
-"Press Enter To Continue With Default Value (49300):"
-"Please provide new password for the MariaDB Root user:"
-"Please confirm the password for root:"
-"Please provide a name for the database or press enter to accept the default (default is VirtualControl):"
-"Please provide the name for the database's user account (default is virtualcontrol):"
-"Please provide a password for the virtualcontrol user or press enter to accept the default (default is [RANDOM STRING]):"
-"Please confirm password:"
-```
+Current Version: [virtualcontrol-4-0003-00039-02](https://www.crestron.com/Software-Firmware/Firmware/4-Series-Control-Systems/VC-4/4-0003-00039-02)
 
 Update values in the following file
 
@@ -79,7 +56,7 @@ Download the vc4 package, unzip it and place the following files inside of the `
 - crestron.repo
 - crestron1.repo
 - requirement.txt
-- virtualcontrol.rpm file (current version: virtualcontrol-4.0000.00007-01.noarch.rpm )
+- virtualcontrol.rpm file (current version: virtualcontrol-4.0003.00039-1.noarch.rpm )
 
 Directory structure should look something like this before running the playbook
 
@@ -102,14 +79,19 @@ Directory structure should look something like this before running the playbook
         │   ├── vault.yml
         │   └── vault.yml.example
         ├── files
-        │   ├── crestron.repo
         │   ├── crestron1.repo
-        │   ├── virtualcontrol-4.0000.00007-01.noarch.rpm
-        │   └── requirement.txt
-        └── tasks
-            ├── install.yml
-            ├── main.yml
-            └── uninstall.yml
+        │   ├── crestron.conf
+        │   ├── crestron.repo
+        │   ├── httpd-auth
+        │   ├── requirement.txt
+        │   └── virtualcontrol-4.0003.00039-1.noarch.rpm
+        ├── tasks
+        │   ├── harden.yml
+        │   ├── install.yml
+        │   ├── main.yml
+        │   └── uninstall.yml
+        └── templates
+            └── udisks-crestron.j2
 ```
 
 _Running the playbook_

@@ -3,8 +3,10 @@
   hosts: all
   gather_facts: yes
   become: yes
+  vars:
+    vc4_action: install
   tasks:
-    - name: "Setup passwordless sudo"
+    - name: Setup passwordless sudo
       lineinfile:
         path: /etc/sudoers
         regexp: "^%wheel *"
@@ -16,6 +18,6 @@
         create: yes
         validate: "/usr/sbin/visudo -cf %s"
 
-    - name: "Run VirtualControl Role"
+    - name: Run VirtualControl Role
       include_role:
         name: virtualcontrol
