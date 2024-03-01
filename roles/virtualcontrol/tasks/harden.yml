@@ -1,0 +1,40 @@
+---
+- name: "{{ vc4_name }} - Add VC-4 firewalld rules for port 443"
+  firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+    immediate: yes
+
+- name: "{{ vc4_name }} - Setup mod_authnz_pam for VC-4 Hardening"
+  lineinfile:
+    path: /etc/httpd/conf.modules.d/55-authnz_pam.conf
+    regexp: "^#.*authnz_pam_module*.so"
+    line: LoadModule authnz_pam_module modules/mod_authnz_pam.so
+    state: present
+
+- name: "{{ vc4_name }} - Copy pam auth config for VC-4 Hardening"
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}/{{ item.src }}"
+  loop:
+    - { src: "httpd-auth", dest: "/etc/pam.d" }
+    - { src: "crestron.conf", dest: "/etc/httpd/conf.modules.d" }
+
+- name: "{{ vc4_name }} - Setup permissions for Shadow VC-4 Hardening"
+  file:
+    path: /etc/shadow
+    group: apache
+    mode: "440"
+
+- name: "{{ vc4_name }} - Configure Se Linux for httpd_md VC-4 Hardening"
+  seboolean:
+    name: httpd_mod_auth_pam
+    state: yes
+    persistent: yes
+
+- name: "{{ vc4_name }} - Restart HTTPD for VC-4 Hardening"
+  systemd:
+    name: httpd
+    daemon_reload: yes
+    state: restarted
