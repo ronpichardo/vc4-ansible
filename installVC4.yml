@@ -21,3 +21,9 @@
     - name: Run VirtualControl Role
       include_role:
         name: virtualcontrol
+
+    - name: Run Additional VirtualControl Configuration
+      include_role:
+        name: virtualcontrol
+      vars:
+        vc4_action: config
