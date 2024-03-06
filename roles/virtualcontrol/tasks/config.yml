@@ -1,0 +1,25 @@
+---
+- name: "{{ vc4_name }} - Configure sysctl file"
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: "^{{ item }}"
+    line: "{{ item }}"
+    state: present
+  register: vc4_cstm_tcp
+  loop:
+    - net.ipv4.tcp_keepalive_intvl=30
+    - net.ipv4.tcp_keepalive_time=30
+    - net.ipv4.tcp_retries2=8
+    - net.core.wmem_max=10000000
+    - net.unix.max_dgram_qlen=4096
+
+- name: "{{ vc4_name }} - Restart sysctl"
+  shell: sysctl -p
+  when: vc4_cstm_tcp.changed == True
+
+- name: "{{ vc4_name }} - Increase file size limit"
+  lineinfile:
+    path: "{{ vc4_install_path }}/conf/crestron.conf"
+    regexp: "^SecRequestBodyLimit.*"
+    line: SecRequestBodyLimit 536870912
+    state: present
