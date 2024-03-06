@@ -121,7 +121,7 @@
 
 - name: "{{ vc4_name }} - Install pip requirements"
   pip:
-    requirements: "{{ vc4_script_path }}/requirement.txt"
+    requirements: "{{ vc4_script_path }}/requirement-{{ ansible_distribution_major_version }}.txt"
     virtualenv: /opt/venv/virtualcontrol/virtualcontrolenv
     virtualenv_python: python3
     state: latest
